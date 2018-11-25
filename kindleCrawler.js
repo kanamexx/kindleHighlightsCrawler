@@ -79,7 +79,6 @@ async function getBookInformation(book, page){
  */
 function IsContainedBook(bookInformation, resultArray){
   if(!resultArray || resultArray.length <= 0){return false;}
-
   return resultArray
     .map(element => {return element.title})
     .includes(bookInformation.title);
