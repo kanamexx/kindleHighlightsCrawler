@@ -1,4 +1,3 @@
-// === modules ===
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 require('dotenv').config();
@@ -7,6 +6,7 @@ const SELECTORS = require('./constants').SELECTORS
 const KINDLE_SIGN_IN_URL = process.env.SIGN_IN_URL
 const MAIL_ADDRESS = process.env.MAIL_ADDRESS;
 const PASSWORD = process.env.PASSWORD;
+const ACCEPT_LANGUAGE = process.env.ACCEPT_LANGUAGE;
 
 const WAITING_TIME = 5000;
 
@@ -17,14 +17,14 @@ const WAITING_TIME = 5000;
     // in headless mode, Accept-Language Header will not set in automatically.
     // if you use it as a non-headless browser, you can run it without this.
     await page.setExtraHTTPHeaders({
-      'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8'
+      'Accept-Language': ACCEPT_LANGUAGE
     })
 
     await signInByAmazonAccount(page);
     let result = await getAllBooksInformation(page);
     browser.close();
 
-    fs.writeFile('sample.json', JSON.stringify(result, null, '  '), "utf-8");
+    fs.writeFile('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
     return;
   } catch(e) {
     console.error(e);

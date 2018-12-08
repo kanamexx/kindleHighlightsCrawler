@@ -1,0 +1,23 @@
+{
+  "name": "scraping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "constants.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanamexx/kindleHighlightsCrawler.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kanamexx/kindleHighlightsCrawler/issues"
+  },
+  "homepage": "https://github.com/kanamexx/kindleHighlightsCrawler#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "puppeteer": "^1.11.0"
+  }
+}
