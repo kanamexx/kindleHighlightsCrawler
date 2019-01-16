@@ -12,7 +12,7 @@ const WAITING_TIME = 5000;
 
 (async() => {
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({headless:false});
     const page = await browser.newPage();
     // in headless mode, Accept-Language Header will not set in automatically.
     // if you use it as a non-headless browser, you can run it without this.
@@ -21,10 +21,11 @@ const WAITING_TIME = 5000;
     })
 
     await signInByAmazonAccount(page);
+    await page.waitFor(WAITING_TIME);
     let result = await getAllBooksInformation(page);
     browser.close();
 
-    fs.writeFile('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
+    await fs.writeFileSync('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
     return;
   } catch(e) {
     console.error(e);
@@ -32,16 +33,11 @@ const WAITING_TIME = 5000;
 })()
 
 async function signInByAmazonAccount(page){
-    // first page
     await page.goto(KINDLE_SIGN_IN_URL, {waitUntil: "domcontentloaded"});
     await page.type(SELECTORS.SIGN_IN.EMAIL, MAIL_ADDRESS);
     await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
     await page.click(SELECTORS.SIGN_IN.SUBMIT);
     await page.waitForNavigation({timeout: 60000, waitUntil: "domcontentloaded"});
-    // second page
-    await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
-    await page.click(SELECTORS.SIGN_IN.SUBMIT);
-    await page.waitFor(WAITING_TIME);
 }
 
 async function getAllBooksInformation(page){
