@@ -12,7 +12,11 @@ const WAITING_TIME = 5000;
 
 (async() => {
   try {
-    const browser = await puppeteer.launch({headless:false});
+    // --no-sandbox will make chromium accepte untrusted web content.
+    // if you surf the internet but Amazon kindle, check on them.(and deside use this option or not)
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     // in headless mode, Accept-Language Header will not set in automatically.
     // if you use it as a non-headless browser, you can run it without this.
@@ -24,7 +28,6 @@ const WAITING_TIME = 5000;
     await page.waitFor(WAITING_TIME);
     let result = await getAllBooksInformation(page);
     browser.close();
-
     await fs.writeFileSync('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
     return;
   } catch(e) {
@@ -38,6 +41,10 @@ async function signInByAmazonAccount(page){
     await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
     await page.click(SELECTORS.SIGN_IN.SUBMIT);
     await page.waitForNavigation({timeout: 60000, waitUntil: "domcontentloaded"});
+    // second page
+    await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
+    await page.click(SELECTORS.SIGN_IN.SUBMIT);
+    await page.waitFor(WAITING_TIME);
 }
 
 async function getAllBooksInformation(page){
@@ -54,7 +61,7 @@ async function getAllBooksInformation(page){
 }
 
 /**
- * get title, auther name and highlights.
+ * get title, author name and highlights.
  * @param {ElementHandle} book - the book to be clicked
  * @param {Page} page - current page
  */
@@ -68,15 +75,15 @@ async function getBookInformation(book, page){
   let title = await page.$eval(SELECTORS.MAIN.TITLE, title => {
     return title.textContent;
   });
-  let auther = await page.$eval(SELECTORS.MAIN.AUTHER, auther => {
-    return auther.textContent;
+  let author = await page.$eval(SELECTORS.MAIN.AUTHOR, author => {
+    return author.textContent;
   });
   let highlights = await getHighlights(title, page);
 
   return {
     url: url,
     title: title,
-    auther: auther,
+    author: author,
     highlights: highlights,
   };
 }
@@ -109,9 +116,10 @@ async function getHighlights(title, page){
   if(!positions || positions.length === 0
     || !highlights || highlights.length === 0){return [];}
   if(positions.length !== highlights.length){
-    console.warn(`the length is not the same.
-      positions: ${positions.length}, highlights: ${highlights.length}.\n
-      this book(title: ${title}) was skipped`);
+    console.warn(
+      `the book(${title}) was skipped\n 
+      Retry later or get rid of pictures from highlights`
+      );
     return [];
   }
 
