@@ -28,7 +28,9 @@ const WAITING_TIME = 5000;
     await page.waitFor(WAITING_TIME);
     let result = await getAllBooksInformation(page);
     browser.close();
+    
     await fs.writeFileSync('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
+    console.log('done.')
     return;
   } catch(e) {
     console.error(e);
