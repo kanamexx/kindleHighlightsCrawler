@@ -10,10 +10,15 @@ const ACCEPT_LANGUAGE = process.env.ACCEPT_LANGUAGE;
 
 const WAITING_TIME = 5000;
 
+const config = require('./gcpConfig/config');
+
 (async() => {
   try {
+    let cloudBucket = config.get('CLOUD_BUCKET');
+    console.log('cloudBucket', cloudBucket);
+
     // --no-sandbox will make chromium accepte untrusted web content.
-    // if you surf the internet but Amazon kindle, check on them.(and deside use this option or not)
+    // if you surf the internet but Amazon kindle, check on them.(and decide use this option or not)
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
@@ -28,7 +33,7 @@ const WAITING_TIME = 5000;
     await page.waitFor(WAITING_TIME);
     let result = await getAllBooksInformation(page);
     browser.close();
-    
+
     await fs.writeFileSync('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
     console.log('done.')
     return;

@@ -1,4 +1,5 @@
-*/.env
-*/node_modules
-*highlights.json
-*/package-lock.json
+.env
+node_modules
+highlights.json
+package-lock.json
+config.json
