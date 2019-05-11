@@ -13,7 +13,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mount
-COPY ./package.json ./package.json
+COPY ./app/package.json ./package.json
 RUN npm install
 
 CMD ["node", "kindleCrawler.js"]

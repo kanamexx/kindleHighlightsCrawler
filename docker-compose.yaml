@@ -1,0 +1,7 @@
+version: '3'
+services:
+  kindlecrawler:
+    image: kanamexx/kindlecrawler
+    build: .
+    volumes:
+      - ./app/:/mount
