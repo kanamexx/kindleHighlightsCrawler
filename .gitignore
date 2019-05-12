@@ -3,3 +3,4 @@ node_modules
 highlights.json
 package-lock.json
 config.json
+googleApplicationCredential.json
