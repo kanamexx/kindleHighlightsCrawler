@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs');
 require('dotenv').config();
 const SELECTORS = require('./constants').SELECTORS
 
@@ -10,10 +9,16 @@ const ACCEPT_LANGUAGE = process.env.ACCEPT_LANGUAGE;
 
 const WAITING_TIME = 5000;
 
+const config = require('./gcpConfig/config');
+const googleCloudAdaptor = require('./adaptor/googleCloudAdaptor');
+const bucket = new googleCloudAdaptor.Bucket(config.get('CLOUD_BUCKET'));
+
+const {Readable} = require('stream');
+
 (async() => {
   try {
     // --no-sandbox will make chromium accepte untrusted web content.
-    // if you surf the internet but Amazon kindle, check on them.(and deside use this option or not)
+    // if you surf the internet but Amazon kindle, check on them.(and decide use this option or not)
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
@@ -26,9 +31,15 @@ const WAITING_TIME = 5000;
 
     await signInByAmazonAccount(page);
     await page.waitFor(WAITING_TIME);
-    let result = await getAllBooksInformation(page);
+    const result = await getAllBooksInformation(page);
     browser.close();
-    await fs.writeFileSync('highlights.json', JSON.stringify(result, null, '  '), "utf-8");
+
+    const stream = new Readable();
+    stream.push(JSON.stringify(result, null, '  '));
+    stream.push(null);
+    bucket.uploadFile("highlights.json", stream);
+
+    console.log('done.')
     return;
   } catch(e) {
     console.error(e);
@@ -48,13 +59,13 @@ async function signInByAmazonAccount(page){
 }
 
 async function getAllBooksInformation(page){
-  let books = await page.$$(SELECTORS.MAIN.BOOKS);
+  const books = await page.$$(SELECTORS.MAIN.BOOKS);
 
-  let res = [];
+  const res = [];
   if(!books || books.length <= 0){return res;}
 
   for(i = 0; i < books.length; i++){
-    let bookInformation = await getBookInformation(books[i], page);
+    const bookInformation = await getBookInformation(books[i], page);
     if(!isContainedBook(bookInformation, res)){res.push(bookInformation);}
   }
   return res;
@@ -69,16 +80,16 @@ async function getBookInformation(book, page){
   await book.click();
   await page.waitFor(WAITING_TIME);
 
-  let url = await page.$eval(SELECTORS.MAIN.URL, asin => {
+  const url = await page.$eval(SELECTORS.MAIN.URL, asin => {
     return asin.href
   });
-  let title = await page.$eval(SELECTORS.MAIN.TITLE, title => {
+  const title = await page.$eval(SELECTORS.MAIN.TITLE, title => {
     return title.textContent;
   });
-  let author = await page.$eval(SELECTORS.MAIN.AUTHOR, author => {
+  const author = await page.$eval(SELECTORS.MAIN.AUTHOR, author => {
     return author.textContent;
   });
-  let highlights = await getHighlights(title, page);
+  const highlights = await getHighlights(title, page);
 
   return {
     url: url,
@@ -106,10 +117,10 @@ function isContainedBook(bookInformation, resultArray){
  * @param {Page} page - current page
  */
 async function getHighlights(title, page){
-  let positions = await page.$$eval(SELECTORS.MAIN.ANNOTATION_HIGHLIGHT_HEADER, positions => {
+  const positions = await page.$$eval(SELECTORS.MAIN.ANNOTATION_HIGHLIGHT_HEADER, positions => {
     return positions.map(position => {return position.textContent});
   });
-  let highlights = await page.$$eval(SELECTORS.MAIN.HIGHLIGHTS, highlights => {
+  const highlights = await page.$$eval(SELECTORS.MAIN.HIGHLIGHTS, highlights => {
     return highlights.map(highlight => {return highlight.textContent});
   });
 

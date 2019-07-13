@@ -1,0 +1,11 @@
+version: '3'
+services:
+  kindlecrawler:
+    image: kanamexx/kindlecrawler
+    build: .
+    volumes:
+      - ./app/:/mount
+      - ./googleApplicationCredential.json:/mount/googleApplicationCredential.json
+    environment: 
+      - PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
+      - GOOGLE_APPLICATION_CREDENTIALS=/mount/googleApplicationCredential.json

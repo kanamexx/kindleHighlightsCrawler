@@ -11,6 +11,7 @@ npm install
 ```
 
 ## Usage
+
 All that you have to do is just only 2 step.
 
 * Make `.env` and write as following for setting up your e-mail address, password and language:
@@ -36,4 +37,10 @@ Or, you can also run kidleCrawler in a docker container:
 ```bash
 sudo docker build -t kindlecrawler .
 sudo docker run -v $(pwd):/mount kindlecrawler
+```
+
+```bash
+
+export GOOGLE_APPLICATION_CREDENTIALS="/home/kaname/Projects/scraping/googleApplicationCredential.json" \
+&& node kindleCrawler.js
 ```
