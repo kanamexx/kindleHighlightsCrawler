@@ -5,7 +5,7 @@ class Bucket {
     constructor (bucketName){
         this.bucket = storage.bucket(bucketName);
     }
-    getFileContent (pathToFile) { 
+    getFileContent (pathToFile) {
         this.bucket.file(pathToFile)
             .createReadStream()
             .setEncoding('utf8')

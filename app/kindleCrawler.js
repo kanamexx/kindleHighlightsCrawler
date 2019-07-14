@@ -51,7 +51,7 @@ async function signInByAmazonAccount(page){
     await page.type(SELECTORS.SIGN_IN.EMAIL, MAIL_ADDRESS);
     await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
     await page.click(SELECTORS.SIGN_IN.SUBMIT);
-    await page.waitForNavigation({timeout: 60000, waitUntil: "domcontentloaded"});
+    await page.waitFor(WAITING_TIME);
     // second page
     await page.type(SELECTORS.SIGN_IN.PASSWORD, PASSWORD);
     await page.click(SELECTORS.SIGN_IN.SUBMIT);
